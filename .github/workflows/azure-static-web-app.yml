@@ -20,9 +20,44 @@ jobs:
         run: npm install
       - name: npm build
         run: npm run build
+      - name: tar output
+        run: tar -czvf output.tar.gz ./out/*
+      - name: upload build artifact
+        uses: actions/upload-artifact@v3.1.3
+        with:
+          name: build
+          path: output.tar.gz
+
+  deploy-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: pr
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
       - name: install swa cli
         run: npm install -g @azure/static-web-apps-cli
       - name: deploy app
+        id: deploy
         run: | 
           swa deploy ./out --deployment-token ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }} \
-            --env ${{ github.event_name == 'pull_request' && 'preview' || 'production' }}
+            --env ${{ github.event_name == 'pull_request' && 'preview' || 'production' }} | tee deploy.log
+          url=$(grep 'Project deployed to' deploy.log | awk '{print $5}')
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+  deploy-production:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: install swa cli
+        run: npm install -g @azure/static-web-apps-cli
+      - name: deploy app
+        id: deploy
+        run: | 
+          swa deploy ./out --deployment-token ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }} \
+            --env ${{ github.event_name == 'pull_request' && 'preview' || 'production' }} | tee deploy.log
+          url=$(grep 'Project deployed to' deploy.log | awk '{print $5}')
+          echo "url=$url" >> "$GITHUB_OUTPUT" 
