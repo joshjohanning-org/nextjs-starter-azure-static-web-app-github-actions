@@ -36,6 +36,12 @@ jobs:
       name: pr
       url: ${{ steps.deploy.outputs.url }}
     steps:
+      - name: download build artifact
+        uses: actions/download-artifact@v2.1.1
+        with:
+          name: build
+      - name: extract output
+        run: tar -xzf output.tar.gz
       - name: install swa cli
         run: npm install -g @azure/static-web-apps-cli
       - name: deploy app
@@ -54,6 +60,12 @@ jobs:
       name: dev
       url: ${{ steps.deploy.outputs.url }}
     steps:
+      - name: download build artifact
+        uses: actions/download-artifact@v2.1.1
+        with:
+          name: build
+      - name: extract output
+        run: tar -xzf output.tar.gz
       - name: install swa cli
         run: npm install -g @azure/static-web-apps-cli
       - name: deploy app
