@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js environment
+      - name: setup node
         uses: actions/setup-node@v4
         with:
           cache: npm
@@ -37,7 +37,7 @@ jobs:
       url: ${{ steps.deploy.outputs.url }}
     steps:
       - name: download build artifact
-        uses: actions/download-artifact@v2.1.1
+        uses: actions/download-artifact@v3
         with:
           name: build
       - name: extract output
@@ -46,10 +46,12 @@ jobs:
         run: npm install -g @azure/static-web-apps-cli
       - name: deploy app
         id: deploy
-        run: | 
+        run: |
+          # deploy site with swa
+          set -o pipefail
           swa deploy ./out --deployment-token ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }} \
-            --env ${{ github.event_name == 'pull_request' && 'preview' || 'production' }} | tee deploy.log
-          url=$(grep 'Project deployed to' deploy.log | awk '{print $5}')
+            --env ${{ github.event_name == 'pull_request' && 'preview' || 'production' }} 2>&1 | tee deploy.log
+          url=$(grep 'Project deployed to' deploy.log | awk '{print $5}' | sed 's/\x1b\[[0-9;]*m//g')
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
   deploy-production:
@@ -61,7 +63,7 @@ jobs:
       url: ${{ steps.deploy.outputs.url }}
     steps:
       - name: download build artifact
-        uses: actions/download-artifact@v2.1.1
+        uses: actions/download-artifact@v3
         with:
           name: build
       - name: extract output
@@ -70,8 +72,10 @@ jobs:
         run: npm install -g @azure/static-web-apps-cli
       - name: deploy app
         id: deploy
-        run: | 
+        run: |
+          # deploy site with swa
+          set -o pipefail
           swa deploy ./out --deployment-token ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }} \
-            --env ${{ github.event_name == 'pull_request' && 'preview' || 'production' }} | tee deploy.log
-          url=$(grep 'Project deployed to' deploy.log | awk '{print $5}')
-          echo "url=$url" >> "$GITHUB_OUTPUT" 
+            --env ${{ github.event_name == 'pull_request' && 'preview' || 'production' }} 2>&1 | tee deploy.log
+          url=$(grep 'Project deployed to' deploy.log | awk '{print $5}' | sed 's/\x1b\[[0-9;]*m//g')
+          echo "url=$url" >> "$GITHUB_OUTPUT"
