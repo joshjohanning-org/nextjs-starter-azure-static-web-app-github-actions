@@ -20,6 +20,8 @@ jobs:
         run: npm install
       - name: npm build
         run: npm run build
+      - name: install swa cli
+        run: npm install -g @azure/static-web-apps-cli
       - name: deploy app
         run: | 
           swa deploy ./out --deployment-token ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }} \
