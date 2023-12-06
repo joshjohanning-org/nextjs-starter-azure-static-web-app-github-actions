@@ -1,0 +1,26 @@
+name: 🚀 Deploy NextJS starter to Azure Static Web App
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          cache: npm
+      - name: npm install
+        run: npm install
+      - name: npm build
+        run: npm run build
+      - name: deploy app
+        run: | 
+          swa deploy ./out --deployment-token ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }} \
+            --env ${{ github.event_name == 'pull_request' && 'preview' || 'production' }}
