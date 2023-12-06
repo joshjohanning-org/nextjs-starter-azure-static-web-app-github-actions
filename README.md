@@ -34,3 +34,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Deploying on Azure Static Web App
+
+If you're starting up your project from scratch, make sure to edit the `next.config.js` file to [include the following](https://nextjs.org/docs/pages/building-your-application/deploying/static-exports):
+
+```js
+const nextConfig = {
+  output: 'export',
+}
+```
+
+When you run `npm run build`, it will copy the contents of the site to the `./out` folder. This is the folder that Azure Static Web Apps will use when deploying your site.
