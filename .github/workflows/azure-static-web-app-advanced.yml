@@ -84,5 +84,5 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           # destroy static web app environment
-          az staticwebapp environment delete -n nextjs-starter --environment-name ${{ format('pr{0}', github.event.number) }}
+          az staticwebapp environment delete -n nextjs-starter --environment-name ${{ format('pr{0}', github.event.number) }} --yes
           gh api --method DELETE "/repos/$repository/environments/${{ format('pr-{0}', github.event.number) }}
