@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: ${{ github.event_name == 'pull_request' && 'pr' || 'dev' }}
+      name: ${{ github.event_name == 'pull_request' && 'pr' || 'production' }}
       url: ${{ steps.deploy.outputs.url }}
     steps:
       - name: download build artifact
