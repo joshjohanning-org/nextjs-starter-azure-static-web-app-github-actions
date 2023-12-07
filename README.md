@@ -46,3 +46,5 @@ const nextConfig = {
 ```
 
 When you run `npm run build`, it will copy the contents of the site to the `./out` folder. This is the folder that Azure Static Web Apps will use when deploying your site.
+
+test
