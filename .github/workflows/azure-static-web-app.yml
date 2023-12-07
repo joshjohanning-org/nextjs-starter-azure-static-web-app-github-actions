@@ -28,38 +28,11 @@ jobs:
           name: build
           path: output.tar.gz
 
-  deploy-pr:
-    if: github.event_name == 'pull_request'
+  deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: pr
-      url: ${{ steps.deploy.outputs.url }}
-    steps:
-      - name: download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-      - name: extract output
-        run: tar -xzf output.tar.gz
-      - name: install swa cli
-        run: npm install -g @azure/static-web-apps-cli
-      - name: deploy app
-        id: deploy
-        run: |
-          # deploy site with swa
-          set -o pipefail
-          swa deploy ./out --deployment-token ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }} \
-            --env ${{ github.event_name == 'pull_request' && 'preview' || 'production' }} 2>&1 | tee deploy.log
-          url=$(grep 'Project deployed to' deploy.log | awk '{print $5}' | sed 's/\x1b\[[0-9;]*m//g')
-          echo "url=$url" >> "$GITHUB_OUTPUT"
-
-  deploy-production:
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: dev
+      name: ${{ github.event_name == 'pull_request' && 'pr' || 'dev' }}
       url: ${{ steps.deploy.outputs.url }}
     steps:
       - name: download build artifact
