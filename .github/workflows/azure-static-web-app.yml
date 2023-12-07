@@ -34,6 +34,9 @@ jobs:
     environment:
       name: ${{ github.event_name == 'pull_request' && 'pr' || 'production' }}
       url: ${{ steps.deploy.outputs.url }}
+    concurrency:
+      group: ${{ github.event_name == 'pull_request' && 'pr' || 'production' }}
+      cancel-in-progress: false
     steps:
       - name: download build artifact
         uses: actions/download-artifact@v3
