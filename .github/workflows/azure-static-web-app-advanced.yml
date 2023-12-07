@@ -36,10 +36,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.head_ref) || 'production' }}
+      name: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || 'production' }}
       url: ${{ steps.deploy.outputs.url }}
     concurrency:
-      group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.head_ref) || 'production' }}
+      group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || 'production' }}
       cancel-in-progress: false
     steps:
       - name: download build artifact
@@ -56,7 +56,7 @@ jobs:
           # deploy site with swa
           set -o pipefail
           swa deploy ./out --deployment-token ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }} \
-            --env ${{ github.event_name == 'pull_request' && format('pr-{0}', github.head_ref) || 'production' }} 2>&1 | tee deploy.log
+            --env ${{ github.event_name == 'pull_request' && format('pr{0}', github.event.number) || 'production' }} 2>&1 | tee deploy.log
           url=$(grep 'Project deployed to' deploy.log | awk '{print $5}' | sed 's/\x1b\[[0-9;]*m//g')
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
@@ -83,5 +83,5 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           # destroy static web app environment
-          az staticwebapp environment delete -n nextjs-starter --environment-name ${{ format('pr-{0}', github.head_ref) }}
-          gh api --method DELETE "/repos/$repository/environments/${{ format('pr-{0}', github.head_ref) }}
+          az staticwebapp environment delete -n nextjs-starter --environment-name ${{ format('pr{0}', github.event.number) }}
+          gh api --method DELETE "/repos/$repository/environments/${{ format('pr-{0}', github.event.number) }}
