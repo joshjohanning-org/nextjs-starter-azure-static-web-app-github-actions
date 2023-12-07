@@ -85,4 +85,4 @@ jobs:
         run: |
           # destroy static web app environment
           az staticwebapp environment delete -n nextjs-starter --environment-name ${{ format('pr{0}', github.event.number) }} --yes
-          gh api --method DELETE "/repos/$repository/environments/${{ format('pr-{0}', github.event.number) }}"
+          gh api --method DELETE "/${{ github.repository }}/environments/${{ format('pr-{0}', github.event.number) }}"
