@@ -23,7 +23,7 @@ jobs:
       - name: tar output
         run: tar -czvf output.tar.gz ./out/*
       - name: upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: output.tar.gz
@@ -39,7 +39,7 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
       - name: extract output

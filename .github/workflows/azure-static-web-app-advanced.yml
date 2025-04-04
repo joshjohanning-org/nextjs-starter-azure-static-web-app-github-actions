@@ -26,7 +26,7 @@ jobs:
       - name: tar output
         run: tar -czvf output.tar.gz ./out/*
       - name: upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: output.tar.gz
@@ -44,7 +44,7 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
       - name: extract output
@@ -68,13 +68,13 @@ jobs:
       pull-requests: write
       id-token: write
     steps:
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@v2
         id: app-token
         with:
           app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.PRIVATE_KEY }}
       - name: Azure login
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
